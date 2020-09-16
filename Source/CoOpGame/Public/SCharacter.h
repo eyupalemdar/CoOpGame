@@ -26,6 +26,12 @@ protected:
 	void LookRight(float Value);
 	#pragma endregion
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UCameraComponent* CameraComp;
+
 private:	
 
 };
