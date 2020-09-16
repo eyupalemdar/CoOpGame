@@ -17,6 +17,11 @@ public:
 	ASCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	void Shoot();
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE bool IsDead() const { return Health <= 0; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,6 +46,12 @@ protected:
 
 	UPROPERTY()
 	ASWeapon* Weapon;
+
+	UPROPERTY(EditAnywhere)
+	float MaxHealth = 100.f;
+
+	UPROPERTY(EditAnywhere)
+	float Health;
 
 private:	
 
