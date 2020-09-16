@@ -24,6 +24,8 @@ protected:
 	void MoveRight(float Value);
 	void LookUp(float Value);
 	void LookRight(float Value);
+	void BeginCrouch();
+	void EndCrouch();
 	#pragma endregion
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
