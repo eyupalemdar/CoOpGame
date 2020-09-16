@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
+class ASWeapon;
+
 UCLASS()
 class COOPGAME_API ASCharacter : public ACharacter
 {
@@ -33,6 +35,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UCameraComponent* CameraComp;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ASWeapon> WeaponClass;
+
+	UPROPERTY()
+	ASWeapon* Weapon;
 
 private:	
 
