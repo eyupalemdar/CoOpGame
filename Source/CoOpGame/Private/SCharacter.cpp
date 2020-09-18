@@ -100,6 +100,8 @@ float ASCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEve
 {
 	float DamageToApply = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
+	UE_LOG(LogTemp, Warning, TEXT("Damage '%f' will applied to character '%s'"), Damage, *GetName());
+
 	DamageToApply = FMath::Min(Health, DamageToApply);
 	Health -= DamageToApply;
 
