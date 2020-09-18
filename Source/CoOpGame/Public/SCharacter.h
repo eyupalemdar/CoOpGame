@@ -33,6 +33,8 @@ protected:
 	void LookRight(float Value);
 	void BeginCrouch();
 	void EndCrouch();
+	void BeginZoom();
+	void EndZoom();
 	#pragma endregion
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -53,6 +55,17 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float Health;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Player", meta = (ClampMin = 0.f, ClampMax = 100.f))
+	float ZoomInterpSpeed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	float ZoomedFOV;
+
+	float DefaultFOV;
+
+	bool bWantsToZoom;
+
 private:	
 
+	
 };
