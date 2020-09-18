@@ -43,16 +43,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UCameraComponent* CameraComp;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ASWeapon> WeaponClass;
 
 	UPROPERTY()
-	ASWeapon* Weapon;
+	ASWeapon* CurrentWeapon;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
+	FName WeaponSocketName;
+
+	UPROPERTY(EditAnywhere, Category = "Player")
 	float MaxHealth = 100.f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Player")
 	float Health;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player", meta = (ClampMin = 0.f, ClampMax = 100.f))
@@ -66,6 +69,6 @@ protected:
 	bool bWantsToZoom;
 
 private:	
-
+	void AdjustFieldOfView(float DeltaTime);
 	
 };

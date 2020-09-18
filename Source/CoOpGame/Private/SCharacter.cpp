@@ -21,6 +21,7 @@ ASCharacter::ASCharacter()
 
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
+	WeaponSocketName = TEXT("WeaponSocket");
 	ZoomedFOV = 65.f;
 	ZoomInterpSpeed = 20.f;
 }
@@ -29,9 +30,9 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Weapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass);
-	Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponSocket"));
-	Weapon->SetOwner(this); // then we can reach the Shooter Character from Weapon
+	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass);
+	CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, WeaponSocketName);
+	CurrentWeapon->SetOwner(this); // then we can reach the Shooter Character from Weapon
 
 	DefaultFOV = CameraComp->FieldOfView;
 }
@@ -40,9 +41,7 @@ void ASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	float TargetFOV = bWantsToZoom ? ZoomedFOV : DefaultFOV;
-	float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
-	CameraComp->SetFieldOfView(NewFOV);
+	AdjustFieldOfView(DeltaTime);
 }
 
 #pragma region Movements
@@ -97,7 +96,6 @@ void ASCharacter::EndZoom()
 {
 	bWantsToZoom = false;
 }
-
 #pragma endregion
 
 // Called to bind functionality to input
@@ -121,8 +119,6 @@ float ASCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEve
 {
 	float DamageToApply = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
-	UE_LOG(LogTemp, Warning, TEXT("Damage '%f' will applied to character '%s'"), Damage, *GetName());
-
 	DamageToApply = FMath::Min(Health, DamageToApply);
 	Health -= DamageToApply;
 
@@ -137,6 +133,15 @@ float ASCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEve
 
 void ASCharacter::Shoot()
 {
-	Weapon->Fire();
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Fire();
+	}
 }
 
+void ASCharacter::AdjustFieldOfView(float DeltaTime)
+{
+	float TargetFOV = bWantsToZoom ? ZoomedFOV : DefaultFOV;
+	float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
+	CameraComp->SetFieldOfView(NewFOV);
+}
