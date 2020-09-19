@@ -3,6 +3,7 @@
 #include "SCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "CoOpGame/Public/Components/SHealthComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "SWeapon.h"
@@ -20,6 +21,8 @@ ASCharacter::ASCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	HealthComp = CreateDefaultSubobject<USHealthComponent>(TEXT("HealthComp"));
 
 	WeaponSocketName = TEXT("WeaponSocket");
 	ZoomedFOV = 65.f;
@@ -120,8 +123,11 @@ float ASCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEve
 {
 	float DamageToApply = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
-	DamageToApply = FMath::Min(Health, DamageToApply);
-	Health -= DamageToApply;
+	if (HealthComp)
+	{
+		DamageToApply = FMath::Min(HealthComp->CurrentHealth, DamageToApply);
+		HealthComp->CurrentHealth -= DamageToApply;
+	}
 
 	if (IsDead())
 	{
@@ -146,6 +152,15 @@ void ASCharacter::EndFire()
 	{
 		CurrentWeapon->EndFire();
 	}
+}
+
+bool ASCharacter::IsDead() const
+{
+	if (HealthComp == nullptr)
+	{
+		return true;
+	}
+	return HealthComp->CurrentHealth <= 0;
 }
 
 void ASCharacter::AdjustFieldOfView(float DeltaTime)

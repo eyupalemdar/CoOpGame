@@ -7,6 +7,7 @@
 #include "SCharacter.generated.h"
 
 class ASWeapon;
+class USHealthComponent;
 
 UCLASS()
 class COOPGAME_API ASCharacter : public ACharacter
@@ -22,7 +23,7 @@ public:
 	void EndFire();
 
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE bool IsDead() const { return Health <= 0; }
+	bool IsDead() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -53,11 +54,8 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponSocketName;
 
-	UPROPERTY(EditAnywhere, Category = "Player")
-	float MaxHealth = 100.f;
-
-	UPROPERTY(EditAnywhere, Category = "Player")
-	float Health;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
+	USHealthComponent* HealthComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player", meta = (ClampMin = 0.f, ClampMax = 100.f))
 	float ZoomInterpSpeed;
