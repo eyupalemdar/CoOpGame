@@ -18,12 +18,9 @@ public:
 	ASCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	//virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	void BeginFire();
 	void EndFire();
-
-	UFUNCTION(BlueprintPure)
-	bool IsDead() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -66,6 +63,12 @@ protected:
 	float DefaultFOV;
 
 	bool bWantsToZoom;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bIsDead;
+
+	UFUNCTION()
+	void OnHealthChanged(USHealthComponent* HealthComponent, float CurrentHealth, float DamageApplied, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 private:	
 	void AdjustFieldOfView(float DeltaTime);

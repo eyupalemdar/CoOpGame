@@ -27,6 +27,7 @@ ASCharacter::ASCharacter()
 	WeaponSocketName = TEXT("WeaponSocket");
 	ZoomedFOV = 65.f;
 	ZoomInterpSpeed = 20.f;
+	bIsDead = false;
 }
 
 void ASCharacter::BeginPlay()
@@ -38,6 +39,8 @@ void ASCharacter::BeginPlay()
 	CurrentWeapon->SetOwner(this); // then we can reach the Shooter Character from Weapon
 
 	DefaultFOV = CameraComp->FieldOfView;
+
+	HealthComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
 
 void ASCharacter::Tick(float DeltaTime)
@@ -119,24 +122,24 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &ASCharacter::EndZoom);
 }
 
-float ASCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	float DamageToApply = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-
-	if (HealthComp)
-	{
-		DamageToApply = FMath::Min(HealthComp->CurrentHealth, DamageToApply);
-		HealthComp->CurrentHealth -= DamageToApply;
-	}
-
-	if (IsDead())
-	{
-		DetachFromControllerPendingDestroy();
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-
-	return DamageToApply;
-}
+//float ASCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+//{
+//	float DamageToApply = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+//
+//	if (HealthComp)
+//	{
+//		DamageToApply = FMath::Min(HealthComp->CurrentHealth, DamageToApply);
+//		HealthComp->CurrentHealth -= DamageToApply;
+//	}
+//
+//	if (IsDead())
+//	{
+//		DetachFromControllerPendingDestroy();
+//		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//	}
+//
+//	return DamageToApply;
+//}
 
 void ASCharacter::BeginFire()
 {
@@ -154,13 +157,18 @@ void ASCharacter::EndFire()
 	}
 }
 
-bool ASCharacter::IsDead() const
+void ASCharacter::OnHealthChanged(USHealthComponent* HealthComponent, float CurrentHealth, float DamageApplied, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (HealthComp == nullptr)
+	if (CurrentHealth <= 0 && !bIsDead)
 	{
-		return true;
+		// Die animations
+
+		bIsDead = true;
+
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(10.f);
 	}
-	return HealthComp->CurrentHealth <= 0;
 }
 
 void ASCharacter::AdjustFieldOfView(float DeltaTime)
