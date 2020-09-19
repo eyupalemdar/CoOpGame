@@ -18,7 +18,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-	void Shoot();
+	void BeginFire();
+	void EndFire();
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE bool IsDead() const { return Health <= 0; }

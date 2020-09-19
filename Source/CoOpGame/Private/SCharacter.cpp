@@ -110,7 +110,8 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASCharacter::Jump);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ASCharacter::BeginCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ASCharacter::EndCrouch);
-	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &ASCharacter::Shoot);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &ASCharacter::BeginFire);
+	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &ASCharacter::EndFire);
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &ASCharacter::BeginZoom);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &ASCharacter::EndZoom);
 }
@@ -131,11 +132,19 @@ float ASCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEve
 	return DamageToApply;
 }
 
-void ASCharacter::Shoot()
+void ASCharacter::BeginFire()
 {
 	if (CurrentWeapon)
 	{
-		CurrentWeapon->Fire();
+		CurrentWeapon->StartFire();
+	}
+}
+
+void ASCharacter::EndFire()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->EndFire();
 	}
 }
 
