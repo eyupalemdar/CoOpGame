@@ -68,7 +68,7 @@ protected:
 	bool bIsDead;
 
 	UFUNCTION()
-	void OnHealthChanged(USHealthComponent* HealthComponent, float CurrentHealth, float DamageApplied, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	void OnHealthChanged(USHealthComponent* OwningHealthComp, float CurrentHealth, float DamageApplied, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 private:	
 	void AdjustFieldOfView(float DeltaTime);
