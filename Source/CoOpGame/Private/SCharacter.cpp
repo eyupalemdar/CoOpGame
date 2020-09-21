@@ -6,6 +6,7 @@
 #include "CoOpGame/Public/Components/SHealthComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "SWeapon.h"
 
 ASCharacter::ASCharacter()
@@ -34,13 +35,18 @@ void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass);
-	CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, WeaponSocketName);
-	CurrentWeapon->SetOwner(this); // then we can reach the Shooter Character from Weapon
-
 	DefaultFOV = CameraComp->FieldOfView;
-
 	HealthComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
+
+	if (HasAuthority())
+	{
+		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass);
+		if (CurrentWeapon)
+		{
+			CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, WeaponSocketName);
+			CurrentWeapon->SetOwner(this); // then we can reach the Shooter Character from Weapon
+		}
+	}
 }
 
 void ASCharacter::Tick(float DeltaTime)
@@ -167,7 +173,11 @@ void ASCharacter::OnHealthChanged(USHealthComponent* OwningHealthComp, float Cur
 
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		DetachFromControllerPendingDestroy();
-		SetLifeSpan(10.f);
+		
+		if (HasAuthority())
+		{
+			SetLifeSpan(10.f);
+		}
 	}
 }
 
@@ -176,4 +186,12 @@ void ASCharacter::AdjustFieldOfView(float DeltaTime)
 	float TargetFOV = bWantsToZoom ? ZoomedFOV : DefaultFOV;
 	float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
 	CameraComp->SetFieldOfView(NewFOV);
+}
+
+void ASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASCharacter, CurrentWeapon);
+	DOREPLIFETIME(ASCharacter, bIsDead);
 }

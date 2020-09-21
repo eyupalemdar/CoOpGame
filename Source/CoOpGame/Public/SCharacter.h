@@ -45,7 +45,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
 	TSubclassOf<ASWeapon> WeaponClass;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	ASWeapon* CurrentWeapon;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
@@ -64,7 +64,7 @@ protected:
 
 	bool bWantsToZoom;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	bool bIsDead;
 
 	UFUNCTION()
@@ -73,4 +73,6 @@ protected:
 private:	
 	void AdjustFieldOfView(float DeltaTime);
 	
+	/** Property replication */
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
